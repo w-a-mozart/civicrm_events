@@ -1,1 +1,8 @@
-name = CiviCRM Events Calendar
+name = CiviCRM Events
+description = CiviCRM Events
+version = 7.x-1.0
+package = CiviCRM
+dependencies[] = civicrm
+core = 7.x
+
+files[] = civicrm_events.module
