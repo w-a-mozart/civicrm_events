@@ -95,6 +95,13 @@
       '#default_value' => variable_get('civicrm_events_event_types', 0),
       '#description' => t('Filter the types of event to be shown on the calendar.'),
     );
+
+    $form['civicrm_events_event_is_public'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Show Only Public Events'),
+      '#default_value' => variable_get('civicrm_events_event_is_public', 0),
+      '#description' => t('Filter showing  public events.'),
+    );
    
     return system_settings_form($form);
   }
@@ -130,7 +137,12 @@
       $monthEventsDate = date("Y-m-d h:i:s",strtotime(date("Y-m-d h:i:s", strtotime($currentDate)) . "+".$monthEvents." month"));
       $whereCondition .= " AND civicrm_event.start_date < '" .$monthEventsDate . "'";
     }
-  
+
+    $ispublicEvents = variable_get('civicrm_events_event_is_public', 0);
+    if($ispublicEvents) {
+      $whereCondition .= " AND civicrm_event.is_public > '" .$ispublicEvents. "'";
+    }
+
     $query = "SELECT `id`, `title`, `start_date` as start, `end_date`  as end FROM `civicrm_event` WHERE civicrm_event.is_active = 1 AND civicrm_event.is_template = 0";
   
     $query .= $whereCondition; 
