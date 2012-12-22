@@ -3,6 +3,7 @@ description = CiviCRM Events
 version = 7.x-1.0
 package = CiviCRM
 dependencies[] = civicrm
+dependencies[] = libraries
 core = 7.x
 
 files[] = civicrm_events.module
