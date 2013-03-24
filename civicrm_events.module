@@ -159,15 +159,15 @@
           $startDate = date("Y,n,j", strtotime( $dao->start_date ) );
         }
         if( isset($endDate) ) {
-	  $endDate   = date("Y,n,j", strtotime( $dao->end_date ) );
+	        $endDate   = date("Y,n,j", strtotime( $dao->end_date ) );
         }
-	$dao->url =   CRM_Utils_System::url( 'civicrm/event/info', 'id=' . $dao->id );
+	      $dao->url =   CRM_Utils_System::url( 'civicrm/event/info', 'id=' . $dao->id, FALSE, NULL, FALSE );
       }
       $eventData = array();
       foreach ($eventCalendarParams as  $k) {
-	$eventData[$k] = $dao->$k; 
-       }	
-       $events['events'][] = $eventData;
+	      $eventData[$k] = $dao->$k; 
+      }	
+      $events['events'][] = $eventData;
     }
 
     drupal_add_js(array('civicrm_events' => $events), 'setting');
