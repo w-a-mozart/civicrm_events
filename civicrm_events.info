@@ -6,3 +6,4 @@ dependencies[] = civicrm
 core = 7.x
 
 files[] = civicrm_events.module
+configure = admin/config/civicrm_events/events_calendar
