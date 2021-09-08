@@ -116,11 +116,14 @@
       return;
     }
   
+    //get fullcalendar path.
+    $fullcalendar_path = libraries_get_path('fullcalendar');
     drupal_add_js(drupal_get_path('module', 'civicrm_events') . '/js/civicrm_events.js');
     drupal_add_css(drupal_get_path('module', 'civicrm_events') . '/css/civicrm_events.css');
-    drupal_add_js(drupal_get_path('module', 'civicrm_events') . '/js/fullcalendar.js');		
-    drupal_add_css(drupal_get_path('module', 'civicrm_events') . '/css/fullcalendar.css');
-    $whereCondition = '';
+    drupal_add_js($fullcalendar_path. '/fullcalendar.js');		
+    drupal_add_css( $fullcalendar_path. '/fullcalendar.css');
+    
+    $whereCondition = ' WHERE civicrm_event.is_active = 1 AND civicrm_event.is_template = 0';
     $eventTypes = variable_get('civicrm_events_event_types', 0);
     if($eventTypes) {
      $whereCondition .= ' AND civicrm_event.event_type_id in (' . implode(",", $eventTypes) . ')';
@@ -143,12 +146,14 @@
       $whereCondition .= " AND civicrm_event.is_public > '" .$ispublicEvents. "'";
     }
 
-    $query = "SELECT `id`, `title`, `start_date` as start, `end_date`  as end FROM `civicrm_event` WHERE civicrm_event.is_active = 1 AND civicrm_event.is_template = 0";
-  
+    $query = "SELECT civicrm_event.id, civicrm_event.title, civicrm_event.start_date as start, civicrm_event.end_date as end, CONCAT('civi-event-type-', civicrm_event.event_type_id) AS className FROM civicrm_event";
+    $query .= " LEFT JOIN civicrm_value_event_details_8 on civicrm_value_event_details_8.entity_id = civicrm_event.id";
     $query .= $whereCondition; 
+    $query .= " ORDER BY civicrm_event.start_date, civicrm_value_event_details_8.sort_order_109";
+    
     $events['events'] = array();
     $dao = CRM_Core_DAO::executeQuery( $query, CRM_Core_DAO::$_nullArray );
-    $eventCalendarParams = array ('title' => 'title', 'start' => 'start', 'url' => 'url');
+    $eventCalendarParams = array ('title' => 'title', 'start' => 'start', 'url' => 'url', 'className' => 'className');
     if(variable_get('civicrm_events_event_end_date', 0)) {
       $eventCalendarParams['end'] = 'end';
     }
@@ -159,14 +164,17 @@
           $startDate = date("Y,n,j", strtotime( $dao->start_date ) );
         }
         if( isset($endDate) ) {
-	        $endDate   = date("Y,n,j", strtotime( $dao->end_date ) );
+          $endDate   = date("Y,n,j", strtotime( $dao->end_date ) );
         }
-	      $dao->url =   CRM_Utils_System::url( 'civicrm/event/info', 'id=' . $dao->id, FALSE, NULL, FALSE );
+        $dao->url =   CRM_Utils_System::url( 'civicrm/event/info', 'id=' . $dao->id );
       }
+
       $eventData = array();
       foreach ($eventCalendarParams as  $k) {
-	      $eventData[$k] = $dao->$k; 
+        $eventData[$k] = $dao->$k; 
       }	
+      
+      // moved color changes to osa.module hook osa_js_alter     
       $events['events'][] = $eventData;
     }
 
@@ -174,4 +182,3 @@
   
     return "<div id='calendar'></div>";
 }
-
